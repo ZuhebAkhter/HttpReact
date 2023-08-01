@@ -2,6 +2,7 @@ import React, { useState,useEffect,useCallback } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
+import MoviesForm from "./components/MoviesForm";
 
 function App() {
   const [movies, setMoviesList] = useState([]);
@@ -54,9 +55,9 @@ function App() {
         setLoading(false)
        
    },[]) 
-   useEffect(()=>{
-    moviesHandler();
-  },[moviesHandler])
+  //  useEffect(()=>{
+  //   moviesHandler();
+  // },[moviesHandler])
    
     
 
@@ -73,6 +74,9 @@ function App() {
    
   return (
     <React.Fragment>
+      <div className='section1'>
+        <MoviesForm/>
+      </div>
       <section>
         <button onClick={moviesHandler}>Fetch Movies</button>
         <button >Cancel</button>
