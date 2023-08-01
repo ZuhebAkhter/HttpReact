@@ -6,6 +6,8 @@ import "./App.css";
 function App() {
   const [movies, setMoviesList] = useState([]);
   const [Loading,setLoading]= useState(false);
+  const [error,setError]=useState(null)
+  const [againRetrydata,setAgainData]=useState(true)
   // const dummyMovies = [
   //   {
   //     id: 1,
@@ -20,9 +22,24 @@ function App() {
   //     releaseDate: '2021-05-19',
   //   },
   // ];
+  const stopHttphandler=()=>{
+    // setErrorfetch(false)
+    // setError(null)
+    setAgainData(false)
+
+   }
+  
    async function moviesHandler() {
+    if(!setAgainData){
+      return;
+    }
     setLoading(true)
-     const response= await fetch("https://swapi.dev/api/films");
+    setError(!error)
+    try{
+     const response= await fetch("https://swapi.dev/api/film");
+     if(!response.ok){
+      throw new Error('SomeWent wrong....retrying')
+     }
      const data=await response.json();
       
         const dataConvert = data.results.map((movieData) => {
@@ -35,18 +52,37 @@ function App() {
         });
         setMoviesList(dataConvert);
         setLoading(false)
+      }catch
+        (error){
+          setError(error.message)
+        }
       
-    
+        setLoading(false)
+       
+
+        setTimeout(()=>{
+          if(againRetrydata ){
+          setAgainData(moviesHandler)
+          }else return;
+        },5000)
   
    }
+    
+   
+  
+   
   return (
     <React.Fragment>
       <section>
         <button onClick={moviesHandler}>Fetch Movies</button>
+        <button onClick={stopHttphandler}>Cancel</button>
       </section>
       <section>
         {!Loading && <MoviesList movies={movies} />}
         {Loading && <p>Loading...</p>}
+        {!Loading && error && <p>{error}</p>}
+        {againRetrydata && ''}
+        {/* {!errorfetch && !Loading && <p>Retrying Stopped</p>} */}
       </section>
     </React.Fragment>
   );
