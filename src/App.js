@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect,useCallback } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
@@ -7,7 +7,7 @@ function App() {
   const [movies, setMoviesList] = useState([]);
   const [Loading,setLoading]= useState(false);
   const [error,setError]=useState(null)
-  const [againRetrydata,setAgainData]=useState(true)
+  // const [againRetrydata,setAgainData]=useState(true)
   // const dummyMovies = [
   //   {
   //     id: 1,
@@ -22,21 +22,15 @@ function App() {
   //     releaseDate: '2021-05-19',
   //   },
   // ];
-  const stopHttphandler=()=>{
-    // setErrorfetch(false)
-    // setError(null)
-    setAgainData(false)
-
-   }
   
-   async function moviesHandler() {
-    if(!setAgainData){
-      return;
-    }
+  
+ 
+  
+   const moviesHandler=useCallback( async()=>{
     setLoading(true)
     setError(!error)
     try{
-     const response= await fetch("https://swapi.dev/api/film");
+     const response= await fetch("https://swapi.dev/api/films");
      if(!response.ok){
       throw new Error('SomeWent wrong....retrying')
      }
@@ -59,14 +53,20 @@ function App() {
       
         setLoading(false)
        
+   },[]) 
+   useEffect(()=>{
+    moviesHandler();
+  },[moviesHandler])
+   
+    
 
-        setTimeout(()=>{
-          if(againRetrydata ){
-          setAgainData(moviesHandler)
-          }else return;
-        },5000)
+        // setTimeout(()=>{
+        //   if(againRetrydata ){
+        //   setAgainData(moviesHandler)
+        //   }else return;
+        // },5000)
   
-   }
+   
     
    
   
@@ -75,13 +75,13 @@ function App() {
     <React.Fragment>
       <section>
         <button onClick={moviesHandler}>Fetch Movies</button>
-        <button onClick={stopHttphandler}>Cancel</button>
+        <button >Cancel</button>
       </section>
       <section>
         {!Loading && <MoviesList movies={movies} />}
         {Loading && <p>Loading...</p>}
         {!Loading && error && <p>{error}</p>}
-        {againRetrydata && ''}
+        {/* {againRetrydata && ''} */}
         {/* {!errorfetch && !Loading && <p>Retrying Stopped</p>} */}
       </section>
     </React.Fragment>
