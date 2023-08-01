@@ -25,27 +25,31 @@ function App() {
   // ];
   
   
+  
  
   
    const moviesHandler=useCallback( async()=>{
     setLoading(true)
     setError(!error)
     try{
-     const response= await fetch("https://swapi.dev/api/films");
+     const response= await fetch("https://try2-7cacf-default-rtdb.asia-southeast1.firebasedatabase.app/movies.json");
      if(!response.ok){
       throw new Error('SomeWent wrong....retrying')
      }
      const data=await response.json();
+     const loadedMovies=[];
+     for(const key in data){
+      loadedMovies.push({
+        id:key,
+        title:data[key].title,
+        openingText:data[key].openingText,
+        releaseDate:data[key].releaseDate
+      })
       
-        const dataConvert = data.results.map((movieData) => {
-          return {
-            id: movieData.episode_id,
-            title: movieData.title,
-            releaseDate: movieData.release_date,
-            openingText: movieData.opening_crawl,
-          };
-        });
-        setMoviesList(dataConvert);
+     }
+      
+       
+        setMoviesList(loadedMovies);
         setLoading(false)
       }catch
         (error){
@@ -66,7 +70,29 @@ function App() {
         //   setAgainData(moviesHandler)
         //   }else return;
         // },5000)
-  
+        // async function postMoviesData(movie){
+        //   console.log(movie)
+        //   const response=await fetch('https://httpreact-2edb8-default-rtdb.firebaseio.com/movieslist.json',{
+        //     method:'POST',
+        //     body:JSON.stringify(movie),
+        //     headers:{
+        //       'content-type':'application/json'
+        //     }
+        //   });
+        //   const data=await response.json();
+        //   console.log(data)
+        // }
+        async function postMoviesData(movie) {
+          const response = await fetch('https://try2-7cacf-default-rtdb.asia-southeast1.firebasedatabase.app/movies.json', {
+            method: 'POST',
+            body: JSON.stringify(movie),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          const data = await response.json();
+          console.log(data);
+        }
    
     
    
@@ -75,7 +101,7 @@ function App() {
   return (
     <React.Fragment>
       <div className='section1'>
-        <MoviesForm/>
+        <MoviesForm onAddMovie={postMoviesData}/>
       </div>
       <section>
         <button onClick={moviesHandler}>Fetch Movies</button>
